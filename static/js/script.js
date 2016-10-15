@@ -3,6 +3,9 @@
 	var deadX = 0;
 	var deadBlock = 0;
 	var deadSent = 0;
+
+	$("#canvas").focus();
+
 	(function () {
 	    var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
 	    window.requestAnimationFrame = requestAnimationFrame;
@@ -39,8 +42,14 @@
 
 	canvas.width = width;
 	canvas.height = height;
+	canvas.style.backgroundColor = "black";
+
+	var oldPlayerX = [];
+	var oldPlayerY = [];
 
 	function update() {
+		
+
 		//console.log(player.y)
 		if(player.y > 200){
 			//location.reload();
@@ -106,8 +115,25 @@
 	    player.velY += gravity;
 
 	    ctx.clearRect(0, 0, width, height);
-	    ctx.fillStyle = "black";
+	    ctx.fillStyle = "white";
 	    ctx.beginPath();
+	    if(player.x -60 > 0) {
+	    	ctx.font="12pxx Arial";
+			ctx.fillText(Math.floor(player.x -60).toString(),canvas.width - 30,20);
+	    }
+	    
+
+	    if(player.x < -400) {
+			ctx.font="30px Arial";
+			ctx.fillText("Here be dragons",10,50);
+			boxes.push({
+				x: 40,
+				y: canvas.height - 50,
+				width: 20,
+				height: 80
+			});
+		};
+	    
 	    
 	    player.grounded = false;
 	    for (var i = 0; i < boxes.length; i++) {
@@ -138,8 +164,23 @@
 	    player.y += player.velY;
 
 	    ctx.fill();
-	    ctx.fillStyle = "red";
+	    ctx.fillStyle = "cyan";
 	    ctx.fillRect(60, player.y, player.width, player.height);
+
+	    oldPlayerX.push(player.x);
+		oldPlayerY.push(player.y);
+		var offset = -4;
+		var fade = 0.1;
+		for(var i = oldPlayerX.length - 15; i < oldPlayerX.length; i++){
+			offset += 4;
+			ctx.beginPath();
+			fade = fade*1.1;
+			var style = "rgba(0,255,255,".concat(fade.toString().concat(")"));
+			ctx.fillStyle = style;
+			ctx.arc(oldPlayerX[i] -player.x +60, oldPlayerY[i] +3, 3, 0, 2*Math.PI);
+			ctx.fill();
+		}
+
 	    frameCount++;
 	    requestAnimationFrame(update);
 	}
@@ -174,6 +215,39 @@
 	    }
 	    return colDir;
 	}
+
+
+	// $('.left').on('vmousedown', function() {
+	// 	keys[37] = true;
+	// 	console.log("herr");
+	// })
+	// $('.left').on('vmouseup', function() {
+	// 	keys[37] = false;
+	// 	console.log("herr");
+	// })
+	// $('.right').on('vmousedown', function() {
+	// 	keys[39] = true;
+	// 	console.log("herr");
+	// })
+	// $('.right').on('vmouseup', function() {
+	// 	keys[39] = false;
+	// 	console.log("herr");
+	// })
+	var infoToggle = false;
+	$('.info').on('click', function() {
+		if(infoToggle) {
+			$('.info').css('width', '50px').css('height', '50px').css('justify-content', 'center').css('align-items', 'center').css('padding', '0px');
+			infoToggle = false;
+			$('.info__text').toggle();
+			$('.info__blob').toggle();
+		}
+		else {
+			$('.info').css('width', '600px').css('height', '300px').css('justify-content', 'flex-start').css('align-items', 'baseline').css('padding', '20px');
+			infoToggle = true;
+			$('.info__text').toggle();
+			$('.info__blob').toggle();
+		}
+	});
 
 	document.body.addEventListener("keydown", function (e) {
 	    keys[e.keyCode] = true;
