@@ -229,10 +229,39 @@
 	// 	keys[39] = true;
 	// 	console.log("herr");
 	// })
-	// $('.right').on('vmouseup', function() {
-	// 	keys[39] = false;
-	// 	console.log("herr");
-	// })
+	$('#jump').tap(function(e) {
+		keys[32] = true;
+		setTimeout(function(){
+		  keys[32] = false;
+		}, 200);
+		console.log("herr");
+	});
+	$('#left').tapstart(function(e) {
+		keys[37] = true;
+		console.log("herr");
+	});
+	$('#left').tapend(function(e) {
+		keys[37] = false;
+		console.log("herr");
+	});
+	$('#right').tapstart(function(e) {
+		keys[39] = true;
+		console.log("herr");
+	});
+	$('#right').tapend(function(e) {
+		keys[39] = false;
+		console.log("herr");
+	});
+
+	$('.reload').click(function(e) {
+		location.reload();
+	})
+
+	if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+	 	$('.mobile__button').show();
+	}
+	
+
 	var infoToggle = false;
 	$('.info').on('click', function() {
 		if(infoToggle) {
