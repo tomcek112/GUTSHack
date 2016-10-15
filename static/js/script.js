@@ -80,12 +80,25 @@
 		}
 		var pixel = 10;
 		boxes = [];
+		var deathMarkers = [];
 		boxes.push({
 		    x: 0,
 		    y: height - 2,
 		    width: width -player.x,
 		    height: 50
 		});
+
+		for(var i = 0; i < globalDeaths.length; i++){
+			deathMarkers.push({
+				x: globalDeaths[i] - player.x + 60,
+				y: 10,
+				width: 1,
+				height: 5,
+				unhittable: 1,
+				color: "yellow"
+			});
+		}
+
 		for(var i = 0; i < array.length; i++){
 			if(canvas.width - player.x + pixel -60 > -10 && canvas.width - player.x + pixel -60 < 10){
 				deadBlock= i;
@@ -96,7 +109,7 @@
 				width: 20,
 				height: 10
 			});
-			pixel += 20;
+			pixel += 40;
 		}
 	    if (keys[38] || keys[32] || keys[87]) {
 	        // up arrow or space
@@ -144,8 +157,9 @@
 	    
 	    
 	    player.grounded = false;
+	    ctx.fillStyle = "white";
 	    for (var i = 0; i < boxes.length; i++) {
-	        ctx.rect(boxes[i].x, boxes[i].y , boxes[i].width, boxes[i].height);
+	        ctx.fillRect(boxes[i].x, boxes[i].y , boxes[i].width, boxes[i].height);
 	        
 	        var dir = colCheck(player, boxes[i]);
 	        if(dir && dir !== "b"){
@@ -163,6 +177,13 @@
 	        }
 
 	    }
+	    ctx.fill();
+
+	    for(var i = 1; i < deathMarkers.length; i++){
+	    	ctx.fillStyle = deathMarkers[i].color;
+	    	ctx.fillRect(deathMarkers[i].x, deathMarkers[i].y , deathMarkers[i].width, deathMarkers[i].height);
+	    }
+	    ctx.fill();
 	    
 	    if(player.grounded){
 	         player.velY = 0;
@@ -194,6 +215,9 @@
 	}
 
 	function colCheck(shapeA, shapeB) {
+		if(shapeB.unhittable) {
+			return;
+		}
 	    var vX = (60 + (shapeA.width / 2)) - (shapeB.x + (shapeB.width / 2)),
 	        vY = (shapeA.y + (shapeA.height / 2)) - (shapeB.y + (shapeB.height / 2)),
 	        hWidths = (shapeA.width / 2) + (shapeB.width / 2),
