@@ -10,6 +10,8 @@ heights = {1:0.0, 2:0.1, 3:0.2, 4:0.3, 5:0.4, 6:0.5, 7:0.6, 8:0.7, 9:0.8, 10:0.9
 
 score = 0
 deaths = 0
+highscore = 0
+deathScores = []
 
 seq = []
 seq_index = 0 
@@ -63,15 +65,16 @@ def chooseNext(prev):
 
 def createBlueprint():
 	u = []
-	u.append(heights[npr.random_integers(0,9)])
+	u.append(heights[npr.random_integers(1,3)])
 	for i in range(1,700):
 		u.append(chooseNext(i-1))
-	return u
+	return checkLevel(u)
 
 
 
 def changeProb(v):
 	p = 0.045 #temp
+	print score
 	for i in range(0, 10):
 		for j in range(score-2, score+2):
 			height = v[j]
@@ -105,13 +108,15 @@ def createNewLevel(blueprint):
 
 	return checkLevel(newLevel)
 
-data = {}
-data['vector'] = createBlueprint()
+# data = {}
+# data['vector'] = createBlueprint()
 
 
 @app.route('/')
 def index():
-	return render_template('index.html')
+	global highscore
+	global deathScores
+	return render_template('index.html', highscore=highscore)
 
 @app.route('/level')
 def get_level():
@@ -121,10 +126,25 @@ def get_level():
 @app.route('/post_level', methods=["GET", "POST"])
 def post_level():
 	vector = request.form["vector"]
-	score = request.form["score"]
+	global score 
+	score =  request.form["score"]
+	global highscore
+	potHighscore = request.form["highscore"]
+	global deathScores
+	deathScores.append(potHighscore)
+	if potHighscore > highscore:
+		highscore = potHighscore
 	changeProb(vector)
-	death += 1
+	global deaths
+	deaths += 1
 	return "ok"
+
+@app.route('/scores')
+def deathsFun():
+	global highscore
+	global deathScores
+	ret = {"highscore": highscore, "deathScores": deathScores}
+	return jsonify(ret)
 
 
 if __name__ == '__main__':
