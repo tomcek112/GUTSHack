@@ -3,17 +3,29 @@
 	<link rel="stylesheet" href="/static/css/style.css">
 	<link href="https://fonts.googleapis.com/css?family=Bungee+Inline" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=IM+Fell+DW+Pica:400i" rel="stylesheet">
+
+
 </head>
 	<body>
 		<div class="aligner">
 		<h1>Hello</h1>
+		<div class="aligner__top">
+			<div class="reload">&#x21bb;</div>
+		</div>
 		<canvas class="centered" id="canvas" width= "500px" height="500px"></canvas>
+		<div class="aligner__bot">
+			<div id="left" class="mobile__button"><</div>
+			<div id="right" class="mobile__button">></div>
+			<div id="jump" class="mobile__button">^</div>
+		</div>
 		<div class="info"><div class="info__blob">i</div><div class="info__text">Hero</div></div>
 		</div>
 		<div class="modal"></modal>
 
 
 	<script   src="http://code.jquery.com/jquery-3.1.1.min.js"   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="   crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-touch-events/1.0.5/jquery.mobile-events.js"></script>
 	<script src="/static/js/script.js"></script>
+
 	
 	</body>
