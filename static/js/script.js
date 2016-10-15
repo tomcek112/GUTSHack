@@ -32,9 +32,16 @@
 
 	var boxes = [];
 	console.log(boxes);
-	var array = [1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+	var array = [];
 	array = $.get('/level').then(function(data) {
-		array = data.result.vector;
+		array = data.result;
+	})
+	var globalHighscore = 0;
+	var globalDeaths = [];
+	$.get('/scores').then(function(data) {
+		globalHighscore = data.highscore;
+		globalDeaths = data.deathScores;
+
 	})
 	// for(var i = 0; i < array.length; i++){
 	// 	array[i] = Math.random();
@@ -51,7 +58,7 @@
 		
 
 		//console.log(player.y)
-		if(player.y > 200){
+		if(player.y > 250){
 			//location.reload();
 			player.speed=0;
 			deadX = player.x;
@@ -61,11 +68,12 @@
 				console.log(deadBlock);
 				formData.append("vector", array);
 				formData.append("score", deadBlock); 
+				formData.append("highscore", Math.floor(player.x)); 
 				var request = new XMLHttpRequest();
 				request.open("POST", "http://127.0.0.1:5000/post_level");
 				request.send(formData);
 				request.onload = function() {
-					location.reload();
+					setTimeout(function() {location.reload()}, 200);
 				}
 				deadSent = 1;
 			}
@@ -95,7 +103,7 @@
 	        if (!player.jumping && player.grounded) {
 	            player.jumping = true;
 	            player.grounded = false;
-	            player.velY = -player.speed * 2;
+	            player.velY = -player.speed * 2.5;
 	        }
 	    }
 	    if (keys[39] || keys[68]) {
