@@ -127,9 +127,9 @@ def get_level():
 def post_level():
 	vector = request.form["vector"]
 	global score 
-	score =  request.form["score"]
+	score =  int(request.form["score"])
 	global highscore
-	potHighscore = request.form["highscore"]
+	potHighscore = int(request.form["highscore"])
 	global deathScores
 	deathScores.append(potHighscore)
 	if potHighscore > highscore:
