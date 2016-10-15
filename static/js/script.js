@@ -1,5 +1,8 @@
-var frameCount = 0;
+	var frameCount = 0;
 	var delfc = 0;
+	var deadX = 0;
+	var deadBlock = 0;
+	var deadSent = 0;
 	(function () {
 	    var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
 	    window.requestAnimationFrame = requestAnimationFrame;
@@ -21,24 +24,44 @@ var frameCount = 0;
 	        grounded: false
 	    },
 	    keys = [],
-	    friction = 0.8,
+	    friction = 0.75,
 	    gravity = 0.3;
 
 	var boxes = [];
 	console.log(boxes);
 	var array = [1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-	for(var i = 0; i < array.length; i++){
-		array[i] = Math.random();
-	};
+	array = $.get('/level').then(function(data) {
+		array = data.result.vector;
+	})
+	// for(var i = 0; i < array.length; i++){
+	// 	array[i] = Math.random();
+	// };
 
 	canvas.width = width;
 	canvas.height = height;
 
 	function update() {
+		//console.log(player.y)
 		if(player.y > 200){
-			location.reload();
+			//location.reload();
+			player.speed=0;
+			deadX = player.x;
+			//console.log(deadX);
+			if(!deadSent){
+				var formData = new FormData();
+				console.log(deadBlock);
+				formData.append("vector", array);
+				formData.append("score", deadBlock); 
+				var request = new XMLHttpRequest();
+				request.open("POST", "http://127.0.0.1:5000/post_level");
+				request.send(formData);
+				request.onload = function() {
+					location.reload();
+				}
+				deadSent = 1;
+			}
 		}
-		var pixel = 30;
+		var pixel = 10;
 		boxes = [];
 		boxes.push({
 		    x: 0,
@@ -47,13 +70,16 @@ var frameCount = 0;
 		    height: 50
 		});
 		for(var i = 0; i < array.length; i++){
+			if(canvas.width - player.x + pixel -60 > -10 && canvas.width - player.x + pixel -60 < 10){
+				deadBlock= i;
+			}
 			boxes.push({
 				x: canvas.width - player.x + pixel,
-				y: (1-array[i])*canvas.height,
+				y: (1-array[i])*canvas.height + 25,
 				width: 20,
 				height: 10
 			});
-			pixel += 10;
+			pixel += 20;
 		}
 	    if (keys[38] || keys[32] || keys[87]) {
 	        // up arrow or space
@@ -85,7 +111,7 @@ var frameCount = 0;
 	    
 	    player.grounded = false;
 	    for (var i = 0; i < boxes.length; i++) {
-	        ctx.rect(boxes[i].x, boxes[i].y, boxes[i].width, boxes[i].height);
+	        ctx.rect(boxes[i].x, boxes[i].y , boxes[i].width, boxes[i].height);
 	        
 	        var dir = colCheck(player, boxes[i]);
 	        if(dir && dir !== "b"){

@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template, request
 import json
 import numpy 
 import numpy.random as npr
@@ -46,7 +46,18 @@ data['vector'] = test
 
 @app.route('/')
 def index():
+	return render_template('index.html')
+
+@app.route('/level')
+def get_level():
 	return jsonify(result=data)
 
+@app.route('/post_level', methods=["GET", "POST"])
+def post_level():
+	print request.form["vector"]
+	print request.form["score"]
+	return "ok"
+
+
 if __name__ == '__main__':
-    app.run(debug=true,port=5001)
+    app.run(debug=True,port=5000)
