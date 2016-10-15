@@ -1,0 +1,55 @@
+body {
+	background-color: black;
+}
+
+.aligner {
+	display: flex;
+	align-items: center;
+  	justify-content: center;
+  	height: 100%;
+  	flex-direction: column;
+}
+
+.aligner__s {
+	display: flex;
+  	flex-direction: row;
+  	margin-top: 10px;
+  	width: 512px;
+}
+
+#canvas {
+	border: 1px solid white;
+	padding: 5px;
+}
+
+h1 {
+	color: white;
+	font-family: 'Bungee Inline', cursive;
+}
+
+.info {
+	position: absolute;
+	bottom: 20px;
+	right: 20px;
+	width: 50px;
+	height: 50px;
+	border: 1px solid white;
+	background-color: white;
+	border-radius: 25px;
+	display: flex;
+	align-items: center;
+  	justify-content: center;
+  	transition: width 0.5s, height 0.5s;
+}
+
+.info__blob {
+	display: flex;
+  	flex-direction: row;
+  	font-family: 'IM Fell DW Pica', serif;
+  	font-size: 25px;
+}
+
+.info__text {
+	font-size: 18px;
+	display: none;
+}
