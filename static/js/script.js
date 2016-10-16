@@ -3,6 +3,7 @@
 	var deadX = 0;
 	var deadBlock = 0;
 	var deadSent = 0;
+	var deadDraw = false;
 
 	$("#canvas").focus();
 
@@ -20,7 +21,7 @@
 	        y: height - 15,
 	        width: 5,
 	        height: 5,
-	        speed: 3,
+	        speed: 4,
 	        velX: 0,
 	        velY: 0,
 	        jumping: false,
@@ -54,8 +55,8 @@
 	var oldPlayerX = [];
 	var oldPlayerY = [];
 
+
 	function update() {
-		
 
 		//console.log(player.y)
 		if(player.y > 250){
@@ -73,7 +74,8 @@
 				request.open("POST", "http://127.0.0.1:5000/post_level");
 				request.send(formData);
 				request.onload = function() {
-					setTimeout(function() {location.reload()}, 200);
+					deadDraw = true;
+					setTimeout(function() {location.reload()}, 1100);
 				}
 				deadSent = 1;
 			}
@@ -116,7 +118,7 @@
 	        if (!player.jumping && player.grounded) {
 	            player.jumping = true;
 	            player.grounded = false;
-	            player.velY = -player.speed * 2.5;
+	            player.velY = -player.speed * 2;
 	        }
 	    }
 	    if (keys[39] || keys[68]) {
@@ -184,6 +186,12 @@
 	    	ctx.fillRect(deathMarkers[i].x, deathMarkers[i].y , deathMarkers[i].width, deathMarkers[i].height);
 	    }
 	    ctx.fill();
+
+	    ctx.fillStyle = "cyan";
+	    ctx.fillRect(globalHighscore - player.x + 60, 10 , 1, 10);
+	    ctx.font="9px Arial";
+		ctx.fillText("Highscore",globalHighscore - player.x + 40,28);
+	    ctx.fill();
 	    
 	    if(player.grounded){
 	         player.velY = 0;
@@ -208,6 +216,18 @@
 			ctx.fillStyle = style;
 			ctx.arc(oldPlayerX[i] -player.x +60, oldPlayerY[i] +3, 3, 0, 2*Math.PI);
 			ctx.fill();
+		}
+
+		if(deadDraw){
+			for (var i = 0; i < settings.density; i++) {
+	          new Particle();
+	        }
+
+	        for (var i in particles) {
+	        	if(i < 500){
+	        		particles[i].draw();
+	        	}
+	        }
 		}
 
 	    frameCount++;
@@ -329,3 +349,132 @@
 		console.log(frameCount - delfc);
 		delfc = frameCount;
 	}
+
+
+
+
+
+
+
+	//PARTICLE TEST
+
+	var particles = {},
+      particleIndex = 0,
+      settings = {
+        density: 100,
+        particleSize: 1,
+        startingX: player.x,
+        startingY: canvas.height,
+        gravity: 0.1,
+        maxLife: 50,
+        groundLevel: canvas.height,
+        leftWall: 0,
+        rightWall: canvas.width
+      };
+
+
+      var seedsX = [];
+      var seedsY = [];
+      var maxAngles = 100;
+      var currentAngle = 0;
+
+      function seedAngles() {
+        seedsX = [];
+        seedsY = [];
+        for (var i = 0; i < maxAngles; i++) {
+          seedsX.push(Math.random() * 20 - 10);
+          seedsY.push(Math.random() * 30 - 10);
+        }
+      }
+
+
+      seedAngles();
+
+
+      function Particle() {
+        if (currentAngle !== maxAngles) {
+          // Establish starting positions and velocities
+          this.x = settings.startingX;
+          this.y = settings.startingY;
+
+          this.vx = seedsX[currentAngle];
+          this.vy = seedsY[currentAngle];
+
+          currentAngle++;
+
+          // Add new particle to the index
+          // Object used as it's simpler to manage that an array
+          particleIndex ++;
+          particles[particleIndex] = this;
+          this.id = particleIndex;
+          this.life = 0;
+          this.maxLife = settings.maxLife;
+        } else {
+          console.log('Generating more seed angles');
+          seedAngles();
+          currentAngle = 0;
+        }
+      }
+
+      Particle.prototype.draw = function() {
+        this.x += this.vx;
+        this.y += this.vy;
+        
+        // Give the particle some bounce
+        if ((this.y + settings.particleSize) > settings.groundLevel) {
+          this.vy *= -0.6;
+          this.vx *= 0.75;
+          this.y = settings.groundLevel - settings.particleSize;
+        }
+
+        // Determine whether to bounce the particle off a wall
+        if (this.x - (settings.particleSize) <= settings.leftWall) {
+          this.vx *= -1;
+          this.x = settings.leftWall + (settings.particleSize);
+        }
+
+        if (this.x + (settings.particleSize) >= settings.rightWall) {
+          this.vx *= -1;
+          this.x = settings.rightWall - settings.particleSize;
+        }
+
+        // Adjust for gravity
+        this.vy += -settings.gravity;
+
+        // Age the particle
+        this.life++;
+
+        // If Particle is old, it goes in the chamber for renewal
+        if (this.life >= this.maxLife) {
+          delete particles[this.id];
+        }
+        ctx.fill()
+        // Create the shapes
+        ctx.fillStyle = "cyan";
+        ctx.fillRect(this.x, this.y, settings.particleSize, settings.particleSize);
+        ctx.clearRect(settings.leftWall, settings.groundLevel, canvas.width, canvas.height);
+        //ctx.beginPath();
+        //ctx.fillStyle="cyan";
+        // Draws a circle of radius 20 at the coordinates 100,100 on the canvas
+        //ctx.arc(this.x, this.y, settings.particleSize, 0, Math.PI*2, true); 
+        //ctx.closePath();
+        ctx.fill();
+      }
+
+      // setInterval(function() {
+      //   ctx.fillStyle = "rgba(10,10,10,0.8)";
+      //   ctx.fillRect(this.x, this.y, canvas.width, canvas.height);
+
+
+      //   // Draw the particles
+      //   for (var i = 0; i < settings.density; i++) {
+      //     new Particle();
+      //   }
+
+      //   for (var i in particles) {
+      //     particles[i].draw();
+      //   }
+      // }, 30);
+
+
+
