@@ -16,28 +16,26 @@ deathScores = []
 seq = []
 seq_index = 0 
 
-propMatrix = [[0.1 for x in range(700)] for y in range(10)] 
+propMatrix = [[0.1 for x in range(350)] for y in range(10)] 
 
 
 def checkLevel(v):
-	for i in range(2, len(v)-1):
-		if v[i-1]-v[i-2] > 0.3:
+	if v[0] > 0.3:
+		v[0] = heights[npr.random_integers(0,2)]
+	for i in range(2, len(v)):
+		if v[i]-v[i-1] > 0.3:
+			v[i] = v[i-1] + 0.3
+		elif v[i-1]-v[i-2] > 0.3:
 			v[i-1] = v[i-2] + 0.3
-		elif v[i-2] == 0.0 and v[i-1] == 0.0 and v[i] == 0.0:
-			v[i] = heights[npr.random_integers(2,10)]
+		elif v[i-2] < 0.2 and v[i-1] < 0.2 and v[i] < 0.2:
+			v[i] = heights[npr.random_integers(3,10)]
+		elif v[i-2] == v[i-1]:
+			while v[i] == v[i-1]:
+				v[i] = heights[npr.random_integers(1,10)]
  		else:
 			v[i] = v[i]
 	return v
 
-# def createBlueprint(l):
-# 	u = []
-# 	for i in range(0,l):
-# 		ri = npr.random_integers(1,10)
-# 		if len(u) > 2 and u[i-1] == 0.0 and u[i-2] == 0.0 and ri == 1:
-# 			u.append(heights[ri + npr.random_integers(1,9)])
-# 		else:
-# 			u.append(heights[ri])
-# 	return checkLevel(u)
 
 def chooseNext(prev):
 	diceRoll = rm.random()
@@ -66,50 +64,41 @@ def chooseNext(prev):
 def createBlueprint():
 	u = []
 	u.append(heights[npr.random_integers(1,3)])
-	for i in range(1,700):
-		u.append(chooseNext(i-1))
+	if deaths % 5 == 0:
+		for i in range(1, 350):
+			u.append(heights[npr.random_integers(1,10)])
+	else:
+		for i in range(1,350):
+			u.append(chooseNext(i-1))
 	return checkLevel(u)
-
 
 
 def changeProb(v):
 	p = 0.045 #temp
-	print score
 	for i in range(0, 10):
 		for j in range(score-2, score+2):
 			height = v[j]
 			if i == height*10:
-				propMatrix[i][j] = propMatrix[i][j] + p
+				if (propMatrix[i][j] + p) < 1:
+					propMatrix[i][j] = propMatrix[i][j] + p
+				else:
+					propMatrix[i][j] = 0.82
 			propMatrix[i][j] = propMatrix[i][j] - 0.005
+	checkProb()
 
 
-# v = createBlueprint()
-# x = [row[0] for row in propMatrix]
-# print v
-# deaths = 7
-# score = 10
-# changeProb(v)
-# y = [row[9] for row in propMatrix]
-# print sum(y)
+def checkProb():
+	for i in range(0, 10):
+		col = [row[i] for row in propMatrix]
+		if abs(1 - sum(row)) > 0.05:
+			highestProb = max(col)
+			highestProbIndex = col.index(highestProb)
+			for i in range(0, len(col)):
+				if i == highestProbIndex:
+					col[i] = 0.73
+				else:
+					col[i] = 0.03
 
-
-
-def createNewLevel(blueprint):
-	newLevel = []
-	# for element in blueprint[:-1]:
-	# 	incr = npr.random_integers(-10,10)
-	# 	temp = round(element + incr)
-	# 	if temp < 0:
-	# 		newLevel.append(0.0)
-	# 	elif temp >= 10:
-	# 		newLevel.append(temp-10)
-	# 	else:
-	# 		newLevel.append(temp)
-
-	return checkLevel(newLevel)
-
-# data = {}
-# data['vector'] = createBlueprint()
 
 
 @app.route('/')
