@@ -3,24 +3,26 @@
 	<link rel="stylesheet" href="/static/css/style.css">
 	<link href="https://fonts.googleapis.com/css?family=Bungee+Inline" rel="stylesheet">
 	<link href="https://fonts.googleapis.com/css?family=IM+Fell+DW+Pica:400i" rel="stylesheet">
-
+	<link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
 
 </head>
 	<body>
 		<div class="aligner">
 		<h1>Hello</h1>
 		<div class="aligner__top">
-			<div class="reload">&#x21bb;</div>
+			<div class="reload" id="hc"style="margin-right: 10px;">&#9760;</div>
+			<div class="reload" id="reload">&#x21bb;</div>
 		</div>
 		<canvas class="centered" id="canvas" width= "500px" height="500px"></canvas>
 		<div class="aligner__bot">
 			<div id="left" class="mobile__button"><</div>
 			<div id="right" class="mobile__button">></div>
-			<div id="jump" class="mobile__button">^</div>
+			<div id="jump" class="mobile__button"><img src="https://d30y9cdsu7xlg0.cloudfront.net/png/7346-200.png" width="50px" height="50px" style="border-radius: 50%; -webkit-filter: invert(1); filter: invert(1);"></div>
 		</div>
-		<h3>{{highscore}}</h3>
+		<h3>Highscore: {{highscore}}</h3>
 		<div class="info"><div class="info__blob">i</div><div class="info__text">Hero</div></div>
 		</div>
+		<img src="https://66.media.tumblr.com/53432a930e319ee152542471450084a2/tumblr_nday62rYhI1tbhv9ro1_500.gif" id="dragon" style="display: none;">
 		
 
 

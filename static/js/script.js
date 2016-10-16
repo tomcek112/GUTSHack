@@ -3,6 +3,8 @@
 	var deadX = 0;
 	var deadBlock = 0;
 	var deadSent = 0;
+	var deadDraw = false;
+	var mode = 0;
 
 	$("#canvas").focus();
 
@@ -20,7 +22,7 @@
 	        y: height - 15,
 	        width: 5,
 	        height: 5,
-	        speed: 3,
+	        speed: 4,
 	        velX: 0,
 	        velY: 0,
 	        jumping: false,
@@ -54,8 +56,12 @@
 	var oldPlayerX = [];
 	var oldPlayerY = [];
 
+
 	function update() {
-		
+
+		if(mode) {
+	        ctx.rotate(((Math.random() * 2) -1)*Math.PI/360);
+		}
 
 		//console.log(player.y)
 		if(player.y > 250){
@@ -73,7 +79,8 @@
 				request.open("POST", "http://127.0.0.1:5000/post_level");
 				request.send(formData);
 				request.onload = function() {
-					setTimeout(function() {location.reload()}, 200);
+					deadDraw = true;
+					setTimeout(function() {location.reload()}, 1100);
 				}
 				deadSent = 1;
 			}
@@ -109,14 +116,19 @@
 				width: 20,
 				height: 10
 			});
-			pixel += 40;
+			if(mode) {
+				pixel += 60
+			}
+			else {
+				pixel += 40;
+			}
 		}
 	    if (keys[38] || keys[32] || keys[87]) {
 	        // up arrow or space
 	        if (!player.jumping && player.grounded) {
 	            player.jumping = true;
 	            player.grounded = false;
-	            player.velY = -player.speed * 2.5;
+	            player.velY = -player.speed * 2;
 	        }
 	    }
 	    if (keys[39] || keys[68]) {
@@ -146,7 +158,9 @@
 
 	    if(player.x < -400) {
 			ctx.font="30px Arial";
-			ctx.fillText("Here be dragons",10,50);
+			ctx.fillText("Here be dragons",10,50); 
+			var img=document.getElementById("dragon");
+    		ctx.drawImage(img,canvas.width - 220,5);
 			boxes.push({
 				x: 40,
 				y: canvas.height - 50,
@@ -159,7 +173,14 @@
 	    player.grounded = false;
 	    ctx.fillStyle = "white";
 	    for (var i = 0; i < boxes.length; i++) {
-	        ctx.fillRect(boxes[i].x, boxes[i].y , boxes[i].width, boxes[i].height);
+	    	if(mode) {
+	    		boxes[i].width = boxes[i].width * 1.5;
+	    		boxes[0].width = boxes[0].width / 1.5;
+	    		ctx.fillRect(boxes[i].x, boxes[i].y , boxes[i].width, boxes[i].height);
+	    	}
+	    	else {
+	        	ctx.fillRect(boxes[i].x, boxes[i].y , boxes[i].width, boxes[i].height);
+	    	};
 	        
 	        var dir = colCheck(player, boxes[i]);
 	        if(dir && dir !== "b"){
@@ -184,6 +205,12 @@
 	    	ctx.fillRect(deathMarkers[i].x, deathMarkers[i].y , deathMarkers[i].width, deathMarkers[i].height);
 	    }
 	    ctx.fill();
+
+	    ctx.fillStyle = "cyan";
+	    ctx.fillRect(globalHighscore - player.x + 60, 10 , 1, 10);
+	    ctx.font="9px Arial";
+		ctx.fillText("Highscore",globalHighscore - player.x + 40,28);
+	    ctx.fill();
 	    
 	    if(player.grounded){
 	         player.velY = 0;
@@ -195,6 +222,14 @@
 	    ctx.fill();
 	    ctx.fillStyle = "cyan";
 	    ctx.fillRect(60, player.y, player.width, player.height);
+	    ctx.fill();
+	    ctx.beginPath();
+	    ctx.fillStyle = "rgba(0,255,255,0.2)";
+	    ctx.arc(60 +1, player.y + 1.5, 7, 0, 2*Math.PI);
+	    ctx.fill();
+	    ctx.fillStyle = "rgba(0,255,255,0.1)";
+	    ctx.arc(60 + 1, player.y + 2.5, 14, 0, 2*Math.PI);
+	    ctx.fill();
 
 	    oldPlayerX.push(player.x);
 		oldPlayerY.push(player.y);
@@ -208,6 +243,18 @@
 			ctx.fillStyle = style;
 			ctx.arc(oldPlayerX[i] -player.x +60, oldPlayerY[i] +3, 3, 0, 2*Math.PI);
 			ctx.fill();
+		}
+
+		if(deadDraw){
+			for (var i = 0; i < settings.density; i++) {
+	          new Particle();
+	        }
+
+	        for (var i in particles) {
+	        	if(i < 500){
+	        		particles[i].draw();
+	        	}
+	        }
 		}
 
 	    frameCount++;
@@ -285,8 +332,11 @@
 		console.log("herr");
 	});
 
-	$('.reload').click(function(e) {
+	$('#reload').click(function(e) {
 		location.reload();
+	});
+	$('#hc').click(function(e) {
+		mode = 1;
 	})
 
 	if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
@@ -329,3 +379,132 @@
 		console.log(frameCount - delfc);
 		delfc = frameCount;
 	}
+
+
+
+
+
+
+
+	//PARTICLE TEST
+
+	var particles = {},
+      particleIndex = 0,
+      settings = {
+        density: 100,
+        particleSize: 1,
+        startingX: player.x,
+        startingY: canvas.height,
+        gravity: 0.1,
+        maxLife: 50,
+        groundLevel: canvas.height,
+        leftWall: 0,
+        rightWall: canvas.width
+      };
+
+
+      var seedsX = [];
+      var seedsY = [];
+      var maxAngles = 100;
+      var currentAngle = 0;
+
+      function seedAngles() {
+        seedsX = [];
+        seedsY = [];
+        for (var i = 0; i < maxAngles; i++) {
+          seedsX.push(Math.random() * 20 - 10);
+          seedsY.push(Math.random() * 30 - 10);
+        }
+      }
+
+
+      seedAngles();
+
+
+      function Particle() {
+        if (currentAngle !== maxAngles) {
+          // Establish starting positions and velocities
+          this.x = settings.startingX;
+          this.y = settings.startingY;
+
+          this.vx = seedsX[currentAngle];
+          this.vy = seedsY[currentAngle];
+
+          currentAngle++;
+
+          // Add new particle to the index
+          // Object used as it's simpler to manage that an array
+          particleIndex ++;
+          particles[particleIndex] = this;
+          this.id = particleIndex;
+          this.life = 0;
+          this.maxLife = settings.maxLife;
+        } else {
+          console.log('Generating more seed angles');
+          seedAngles();
+          currentAngle = 0;
+        }
+      }
+
+      Particle.prototype.draw = function() {
+        this.x += this.vx;
+        this.y += this.vy;
+        
+        // Give the particle some bounce
+        if ((this.y + settings.particleSize) > settings.groundLevel) {
+          this.vy *= -0.6;
+          this.vx *= 0.75;
+          this.y = settings.groundLevel - settings.particleSize;
+        }
+
+        // Determine whether to bounce the particle off a wall
+        if (this.x - (settings.particleSize) <= settings.leftWall) {
+          this.vx *= -1;
+          this.x = settings.leftWall + (settings.particleSize);
+        }
+
+        if (this.x + (settings.particleSize) >= settings.rightWall) {
+          this.vx *= -1;
+          this.x = settings.rightWall - settings.particleSize;
+        }
+
+        // Adjust for gravity
+        this.vy += -settings.gravity;
+
+        // Age the particle
+        this.life++;
+
+        // If Particle is old, it goes in the chamber for renewal
+        if (this.life >= this.maxLife) {
+          delete particles[this.id];
+        }
+        ctx.fill()
+        // Create the shapes
+        ctx.fillStyle = "cyan";
+        ctx.fillRect(this.x, this.y, settings.particleSize, settings.particleSize);
+        ctx.clearRect(settings.leftWall, settings.groundLevel, canvas.width, canvas.height);
+        //ctx.beginPath();
+        //ctx.fillStyle="cyan";
+        // Draws a circle of radius 20 at the coordinates 100,100 on the canvas
+        //ctx.arc(this.x, this.y, settings.particleSize, 0, Math.PI*2, true); 
+        //ctx.closePath();
+        ctx.fill();
+      }
+
+      // setInterval(function() {
+      //   ctx.fillStyle = "rgba(10,10,10,0.8)";
+      //   ctx.fillRect(this.x, this.y, canvas.width, canvas.height);
+
+
+      //   // Draw the particles
+      //   for (var i = 0; i < settings.density; i++) {
+      //     new Particle();
+      //   }
+
+      //   for (var i in particles) {
+      //     particles[i].draw();
+      //   }
+      // }, 30);
+
+
+
