@@ -4,6 +4,7 @@
 	var deadBlock = 0;
 	var deadSent = 0;
 	var deadDraw = false;
+	var mode = 0;
 
 	$("#canvas").focus();
 
@@ -58,6 +59,10 @@
 
 	function update() {
 
+		if(mode) {
+	        ctx.rotate(((Math.random() * 2) -1)*Math.PI/360);
+		}
+
 		//console.log(player.y)
 		if(player.y > 250){
 			//location.reload();
@@ -111,7 +116,12 @@
 				width: 20,
 				height: 10
 			});
-			pixel += 40;
+			if(mode) {
+				pixel += 60
+			}
+			else {
+				pixel += 40;
+			}
 		}
 	    if (keys[38] || keys[32] || keys[87]) {
 	        // up arrow or space
@@ -148,7 +158,9 @@
 
 	    if(player.x < -400) {
 			ctx.font="30px Arial";
-			ctx.fillText("Here be dragons",10,50);
+			ctx.fillText("Here be dragons",10,50); 
+			var img=document.getElementById("dragon");
+    		ctx.drawImage(img,canvas.width - 220,5);
 			boxes.push({
 				x: 40,
 				y: canvas.height - 50,
@@ -161,7 +173,14 @@
 	    player.grounded = false;
 	    ctx.fillStyle = "white";
 	    for (var i = 0; i < boxes.length; i++) {
-	        ctx.fillRect(boxes[i].x, boxes[i].y , boxes[i].width, boxes[i].height);
+	    	if(mode) {
+	    		boxes[i].width = boxes[i].width * 1.5;
+	    		boxes[0].width = boxes[0].width / 1.5;
+	    		ctx.fillRect(boxes[i].x, boxes[i].y , boxes[i].width, boxes[i].height);
+	    	}
+	    	else {
+	        	ctx.fillRect(boxes[i].x, boxes[i].y , boxes[i].width, boxes[i].height);
+	    	};
 	        
 	        var dir = colCheck(player, boxes[i]);
 	        if(dir && dir !== "b"){
@@ -203,6 +222,14 @@
 	    ctx.fill();
 	    ctx.fillStyle = "cyan";
 	    ctx.fillRect(60, player.y, player.width, player.height);
+	    ctx.fill();
+	    ctx.beginPath();
+	    ctx.fillStyle = "rgba(0,255,255,0.2)";
+	    ctx.arc(60 +1, player.y + 1.5, 7, 0, 2*Math.PI);
+	    ctx.fill();
+	    ctx.fillStyle = "rgba(0,255,255,0.1)";
+	    ctx.arc(60 + 1, player.y + 2.5, 14, 0, 2*Math.PI);
+	    ctx.fill();
 
 	    oldPlayerX.push(player.x);
 		oldPlayerY.push(player.y);
@@ -305,8 +332,11 @@
 		console.log("herr");
 	});
 
-	$('.reload').click(function(e) {
+	$('#reload').click(function(e) {
 		location.reload();
+	});
+	$('#hc').click(function(e) {
+		mode = 1;
 	})
 
 	if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {

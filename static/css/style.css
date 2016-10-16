@@ -40,6 +40,7 @@ h1 {
 	align-items: center;
   	justify-content: center;
   	transition: width 0.5s, height 0.5s;
+  	cursor: pointer;
 }
 
 .info__blob {
@@ -47,6 +48,7 @@ h1 {
   	flex-direction: row;
   	font-family: 'IM Fell DW Pica', serif;
   	font-size: 25px;
+  	cursor: pointer;
 }
 
 .info__text {
@@ -94,6 +96,7 @@ h1 {
 	align-items: center;
   	justify-content: center;
   	font-family: Lucida Sans Unicode;
+  	cursor: pointer;
 }
 
 h3 {
